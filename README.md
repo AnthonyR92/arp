@@ -1,7 +1,7 @@
 # My Portfolio 
 
 ## Project 1
-![Service] {assets/service_2.png}
+![Service]{assets/service_2.png} 
 
 ## Project 2
 
