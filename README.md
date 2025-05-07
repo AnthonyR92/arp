@@ -62,14 +62,12 @@ This was created into a heatmap under the reference lat_longs and then applied t
 ![Figure 16 - Heat map displaying density of crimes by LSOA](assets/Picture16.png)
 
 ## Time Series Analysis
-Various other visualisation tools were explored during the EDA process which can be viewed in the appendix, this included: histograms from the matplot library and seaborn, facet grid, boxplots, violin plots, scatterplots, and analysis from Sweetviz, the automated EDA function.  
-
 ### Line Chart
 The intention of this project was to look at time series analysis for the crime data, one of the most effective charts for viewing data over time is the line chart. To create this visual, the ‘ID’ column created in figure 17 was required. 
 ![Figure 17 - Creation of ID_sum_date column, plotted on a line chart over calendar month (X axis)](assets/Picture17.png)
 
 ## Final Dataset 
-Now that a full EDA of the dataset had been completed, the next step was to identify the required columns to complete the time series analysis. A new notebook was created and new libraries imported, appendix 2. A new file for import was created, following the EDA, it was determined that it would be beneficial to have a larger dataset from the source to cover a greater time-period. The dataset was cleaned pre-import, with all unnecessary columns dropped, leaving the required columns of ‘Date’, ‘Month’, and ‘ID’. 
+Now that a full EDA of the dataset had been completed, the next step was to identify the required columns to complete the time series analysis. A new notebook was created and new libraries imported. A new file for import was created, following the EDA, it was determined that it would be beneficial to have a larger dataset from the source to cover a greater time-period. The dataset was cleaned pre-import, with all unnecessary columns dropped, leaving the required columns of ‘Date’, ‘Month’, and ‘ID’. 
 ![Figure 18 - Import of new dataset, parsing dates and creating index](assets/Picture18.png)
 
 ## Creating the Model
@@ -80,32 +78,40 @@ Ahead of creating the machine learning model, a cell is executed to define mape,
 A function is created named ‘plot_tss_df’ which will be used to create a line chart for the full date range showing allowing the user to see behaviours over time.  
 ![Figure 21 - Function plot_tss_df created to plot line chart](assets/Picture21.png)
 
+### Time Series Decomposition
 Libraries are imported, statsmodel.tsa.seasonal library and dateutil.parser, which will be utilised to identify seasonality. A function is created named ‘result_add’ which will assist in identifying time series decomposition, the function identifies that the value being tracked is ‘ID’; its an additive model; over a month start frequency. This can then be plotted across four charts, which together display the behaviour over time, trend, seasonality, and residuals.
 ![Figure 22](assets/Picture22.png)
 ![Figure 22 - Four charts plotting actuals, seasonality, trend, and residuals](assets/Picture23.png)
 
+### Reconstructed Dataframe
 Using the data from the ‘result_add’ function, a dataframe is created ‘df_reconstructed’. This will be utilised when the time series predictive model is tested.
 ![Figure 23 - Creation of a dataframe of the values generated in the decomposition](assets/Picture24.png)
 ![Figure 24 - A table displaying the reconstructed values](assets/Picture25.png)
 
+### Health Check of the model
 A health check of the dataframe is completed ahead of training the predictive model. 
 ![Figure 25 - Health check confirming there are no missing values from Date](assets/Picture26.png)
 
+### Creating the train and test data
 The dataframe is then created as ‘data’ 
 ![Figure 26 - Dataframe created as data, capturing all key elements for the predictive model](assets/Picture27.png)
 
 The train and test data sets are determined.
 ![Figure 27 - Determining the split of train and test data, plotted on a line chart](assets/Picture28.png)
 
+### Creating the measure of success for the prediction
 A function is created named ‘forecast_accuracy’. 
 ![Figure 28 - Creation a function to determine the measures for forecast accuracy](assets/Picture29.png)
 
+### SARIMAX
 To carry out the predictive machine learning, the skforecast library is imported and the SARIMAX model is imported. This model is described ‘as a powerful tool for modelling and forecasting both trends and seasonal variations in temporal data, while incorporating exogenous variables into the analysis to improve prediction accuracy.’ (Melanie, 2024). This is a model which is effective for stationary time series. Three coefficients: autoregression, integration, and moving-average once found within the dataset will find the optimum regression to ensure consistent predictions.
 ![Figure 29 - Importing the SARIMAX model](assets/Picture30.png)
 
+### Autocorrelation and Partial Autocorrelation
 The dataframe is plotted for autocorrelation and partial autocorrelation, by feature engineering a lag of 34 and 16, figure 30. A lag is ‘used to capture the temporal dependencies and patterns in time series data’ (Lagged Features, no date). 
 ![Figure 30 - Determining the lag and plotting on an autocorrelation and partial autocorrelation chart](assets/Picture31.png)
 
+### Hyperparameters
 The next stage was completing a hyperparameter grid search, these ‘are external parameters of the model. They are parameters that are required to be set before training’ (Ogunsanya, Michael, Isichei, Joan and Desai, Salil, 2023), in this instance order, seasonality, and trend. The hyperparameter grid search failed on the first occasion as it attempted to compare against 500+ models, to address this the range was changed to run through half the volume of models. However, the code still encountered issues, a third amendment to the range was successful and the hyperparameter grid search was compared against 128 models, figure 31. 
 ![Figure 31 - Running a hyperparameter grid search](assets/Picture32.png)
 ![Figure 32 - Success of the hyperparameter grid search and returned values](assets/Picture33.png)
@@ -114,6 +120,7 @@ The code updated the forecaster with the best-found parameters, the results were
 ![Figure 33 - Viewing the results of the hyperparameter grid search](assets/Picture34.png)
 ![Figure 34 - Feature engineering the forecaster based on the results of the hyperparameter grid search](assets/Picture35.png)
 
+### Running the Prediction Model
 A feature is created named y_pred which will run the feature engineered forecaster through the predict function, figure 35, and a feature is created named y_fit to capture the values used for training the model, figure 36. These can then be plotted on a line chart to display the results of the prediction model versus the actuals, figure 37. Once the forecast_accuracy feature is performed against the y_pred, a mape is generated, figure 38, which is below 10% indicating an acceptable fit for a prediction model.  
 ![Figure 35 - Creation of a feature named y_pred](assets/Picture36.png)
 ![Figure 36 - Creation of a feature named y_fit](assets/Picture37.png)
